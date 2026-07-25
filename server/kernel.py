@@ -98,8 +98,8 @@ class KernelService:
             },
             "metrics": {
                 "gini": float(calculate_gini(consumer_balances)) if consumer_balances else 0.0,
-                "cpi": float(round((self.env.market_price / getattr(self.env, "base_price", 10.0)) * 100.0, 2)),
-                "real_gdp": float(round(getattr(self.env, "last_real_gdp", 0.0), 2)),
+                "cpi": float(calculate_cpi(self.env.market_price, getattr(self.env, "base_price", 10.0))),
+                "real_gdp": float(calculate_real_gdp(getattr(self.env, "last_consumption_spend", 0.0), self.env.market_price, getattr(self.env, "base_price", 10.0))),
                 "lorenz_curve": calculate_lorenz_curve(consumer_balances) if consumer_balances else {"quantiles": [], "cumulative_wealth": []},
                 "total_money": float(sum(balances) + self.env.treasury),
                 "treasury": float(self.env.treasury),
