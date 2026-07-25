@@ -1,10 +1,11 @@
 import functools
+from typing import ClassVar
 import numpy as np
 from gymnasium.spaces import Box
 from pettingzoo import ParallelEnv
 
 class MarketEnv(ParallelEnv):
-    metadata = {"render_modes": ["human"], "name": "market_v0"}
+    metadata: ClassVar[dict] = {"render_modes": ["human"], "name": "market_v0"}
 
     def __init__(self, num_consumers=10, num_producers=2, max_cycles=100, agent_filter=None, render_mode=None, tax_rate=0.0):
         self.num_consumers = num_consumers
@@ -39,12 +40,12 @@ class MarketEnv(ParallelEnv):
         """Cobb-Douglas utility: C^0.7 * (1-L)^0.3"""
         return float((consumption ** 0.7) * ((1.0 - labor) ** 0.3))
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def observation_space(self, agent):
         # [normalized_prev_wage, normalized_prev_price, normalized_balance]
         return Box(low=0, high=1, shape=(3,), dtype=np.float32)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def action_space(self, agent):
         if "consumer" in agent:
             # [labor (0-1), consumption_percent (0-1)]

@@ -19,7 +19,7 @@ def test_market_gym_env():
     
     assert obs is not None
     assert not np.isnan(obs).any()
-    assert isinstance(reward, float) or isinstance(reward, np.float32) or isinstance(reward, np.float64)
-    assert isinstance(done, bool) or isinstance(done, np.bool_)
-    assert isinstance(truncated, bool) or isinstance(truncated, np.bool_)
+    assert isinstance(reward, (float, np.float32, np.float64))
+    assert isinstance(done, (bool, np.bool_))
+    assert isinstance(truncated, (bool, np.bool_))
     assert isinstance(info, dict)

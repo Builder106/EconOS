@@ -22,7 +22,7 @@ def test_cobb_douglas_utility():
 def test_money_conservation():
     """Verify that total money in the system is conserved across steps."""
     env = MarketEnv(num_consumers=10, num_producers=2)
-    obs, info = env.reset()
+    _obs, _info = env.reset()
     
     def get_total_money():
         # Sum of all agent balances
@@ -36,7 +36,7 @@ def test_money_conservation():
         for agent in env.agents:
             actions[agent] = env.action_space(agent).sample()
         
-        obs, rewards, terminations, truncations, infos = env.step(actions)
+        _obs, _rewards, terminations, _truncations, _infos = env.step(actions)
         if any(terminations.values()):
             break
 
@@ -49,7 +49,7 @@ def test_money_conservation():
 def test_environment_reset():
     """Verify that reset returns valid observations for all agents."""
     env = MarketEnv()
-    obs, info = env.reset()
+    obs, _info = env.reset()
     assert len(obs) == len(env.possible_agents)
     for agent, o in obs.items():
         assert not np.isnan(o).any()
@@ -74,7 +74,7 @@ def test_environment_branches():
     env.apply_shock("wage", 0.5)
     env.apply_shock("price", -0.2)
     # trigger step with empty actions to hit 'if not actions'
-    o, r, t, tr, i = env.step({})
+    o, _r, _t, _tr, _i = env.step({})
     assert not o
 
     # trigger step with actual actions to apply shocks

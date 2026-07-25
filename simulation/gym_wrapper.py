@@ -26,7 +26,7 @@ class MarketGymEnv(gym.Env):
         # In this simplified single-agent view, we apply the same action to all agents
         # (Parameter sharing)
         actions = {agent: action for agent in self.agents}
-        obs, rewards, terminations, truncations, infos = self.env.step(actions)
+        obs, rewards, terminations, truncations, _infos = self.env.step(actions)
         
         # Return the average reward and common obs for the next step
         avg_reward = np.mean(list(rewards.values()))

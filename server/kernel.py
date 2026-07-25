@@ -27,7 +27,7 @@ def _try_load_ppo(path: str):
     try:
         from stable_baselines3 import PPO
         return PPO.load(path)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         print(f"[kernel] failed to load {path}: {exc}", flush=True)
         return None
 
@@ -68,7 +68,7 @@ class KernelService:
             self._task.cancel()
             try:
                 await self._task
-            except (asyncio.CancelledError, Exception):
+            except (asyncio.CancelledError, Exception):  # noqa: BLE001, S110
                 pass
 
     def _act(self, agent: str, obs):
