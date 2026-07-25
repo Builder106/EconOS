@@ -149,6 +149,16 @@ def _cmd_tax(kernel, conn: Connection, args: List[str]) -> dict:
     return {"output": f"tax_rate → {result['tax_rate']*100:.2f}%"}
 
 
+@_register("redistribute", True, "redistribute — disburse treasury to consumers as UBI")
+def _cmd_redistribute(kernel, conn: Connection, args: List[str]) -> dict:
+    res = kernel.cmd_redistribute()
+    kernel.broadcast_event({
+        "type": "event", "kind": "ubi_redistributed", "by": "admin",
+        "detail": {"total": res["total"], "per_consumer": res["per_consumer"]},
+    })
+    return {"output": f"disbursed {res['total']:.2f} treasury ({res['per_consumer']:.2f} per consumer) as UBI."}
+
+
 @_register("shock", True, "shock <wage|price> <pct> — one-shot multiplicative")
 def _cmd_shock(kernel, conn: Connection, args: List[str]) -> dict:
     if len(args) < 2:

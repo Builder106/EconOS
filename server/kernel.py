@@ -13,7 +13,7 @@ import time
 from typing import Optional, Set
 
 from simulation.environment import MarketEnv
-from simulation.logic import calculate_gini
+from simulation.logic import calculate_gini, calculate_lorenz_curve, calculate_cpi, calculate_real_gdp
 
 CONSUMER_MODEL_PATH = os.environ.get("CONSUMER_MODEL", "models/consumer_policy.zip")
 PRODUCER_MODEL_PATH = os.environ.get("PRODUCER_MODEL", "models/producer_policy.zip")
@@ -98,6 +98,9 @@ class KernelService:
             },
             "metrics": {
                 "gini": float(calculate_gini(consumer_balances)) if consumer_balances else 0.0,
+                "cpi": float(round((self.env.market_price / getattr(self.env, "base_price", 10.0)) * 100.0, 2)),
+                "real_gdp": float(round(getattr(self.env, "last_real_gdp", 0.0), 2)),
+                "lorenz_curve": calculate_lorenz_curve(consumer_balances) if consumer_balances else {"quantiles": [], "cumulative_wealth": []},
                 "total_money": float(sum(balances) + self.env.treasury),
                 "treasury": float(self.env.treasury),
             },
@@ -155,6 +158,10 @@ class KernelService:
     def cmd_set_tax(self, rate: float) -> dict:
         self.env.set_tax_rate(rate)
         return {"ok": True, "tax_rate": float(self.env.tax_rate)}
+
+    def cmd_redistribute(self) -> dict:
+        total, per_consumer = self.env.redistribute_treasury()
+        return {"ok": True, "total": float(total), "per_consumer": float(per_consumer)}
 
     def cmd_shock(self, kind: str, magnitude: float) -> dict:
         self.env.apply_shock(kind, magnitude)

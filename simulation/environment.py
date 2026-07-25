@@ -65,6 +65,10 @@ class MarketEnv(ParallelEnv):
         # We start with some sensible defaults
         self.market_wage = 10.0
         self.market_price = 10.0
+        self.base_price = 10.0
+        self.last_cpi = 100.0
+        self.last_real_gdp = 0.0
+        self.last_consumption_spend = 0.0
 
         self.agent_balances = {
             agent: 50.0 if "consumer" in agent else 200.0 for agent in self.agents
@@ -74,6 +78,18 @@ class MarketEnv(ParallelEnv):
 
         observations = {agent: self._get_obs(agent) for agent in self.agents}
         return observations, self.infos
+
+    def redistribute_treasury(self):
+        """Disburse accumulated treasury tax revenue equally to active consumers as UBI."""
+        consumers = [a for a in self.agents if "consumer" in a]
+        if not consumers or self.treasury <= 0:
+            return 0.0, 0.0
+        amount_per_consumer = float(self.treasury / len(consumers))
+        total_disbursed = float(self.treasury)
+        for c in consumers:
+            self.agent_balances[c] += amount_per_consumer
+        self.treasury = 0.0
+        return total_disbursed, amount_per_consumer
 
     def _get_obs(self, agent):
         # Simple normalization: divide by 100 max
@@ -118,6 +134,11 @@ class MarketEnv(ParallelEnv):
         total_wage_bill = total_labor * self.market_wage
         total_consumption_spend = sum([actions[a][1] * self.agent_balances[a] for a in self.agents if "consumer" in a])
         
+        self.last_consumption_spend = float(total_consumption_spend)
+        self.last_cpi = float((self.market_price / self.base_price) * 100.0)
+        cpi_ratio = self.last_cpi / 100.0
+        self.last_real_gdp = float(total_consumption_spend / cpi_ratio) if cpi_ratio > 0 else 0.0
+
         # 2a. Update Consumers
         for agent in self.agents:
             if "consumer" in agent:

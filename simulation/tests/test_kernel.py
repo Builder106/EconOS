@@ -110,3 +110,44 @@ def test_logic_functions():
     # perfect equality
     gini_zero = calculate_gini([10, 10, 10])
     assert gini_zero == pytest.approx(0.0, abs=1e-5)
+
+def test_ubi_redistribution():
+    """Verify that treasury tax revenue is correctly redistributed to consumers as UBI."""
+    env = MarketEnv(num_consumers=10, num_producers=2, tax_rate=0.20)
+    env.reset()
+    
+    # Generate income and tax to populate treasury
+    actions = {a: env.action_space(a).sample() for a in env.agents}
+    env.step(actions)
+    
+    initial_treasury = env.treasury
+    if initial_treasury > 0:
+        consumer_balances_before = [env.agent_balances[c] for c in env.agents if "consumer" in c]
+        total_disbursed, per_consumer = env.redistribute_treasury()
+        
+        assert env.treasury == 0.0
+        assert total_disbursed == pytest.approx(initial_treasury)
+        assert per_consumer == pytest.approx(initial_treasury / 10.0)
+        
+        consumer_balances_after = [env.agent_balances[c] for c in env.agents if "consumer" in c]
+        for b_before, b_after in zip(consumer_balances_before, consumer_balances_after):
+            assert b_after == pytest.approx(b_before + per_consumer)
+
+def test_macro_analytics():
+    """Verify CPI, Real GDP, and Lorenz Curve calculation functions."""
+    from simulation.logic import calculate_lorenz_curve, calculate_cpi, calculate_real_gdp
+    
+    # CPI & GDP
+    cpi = calculate_cpi(15.0, base_price=10.0)
+    assert cpi == 150.0
+    
+    gdp = calculate_real_gdp(300.0, current_price=15.0, base_price=10.0)
+    assert gdp == 200.0
+    
+    # Lorenz curve
+    lorenz = calculate_lorenz_curve([10, 20, 30, 40], num_points=5)
+    assert "quantiles" in lorenz and "cumulative_wealth" in lorenz
+    assert len(lorenz["quantiles"]) == 6
+    assert lorenz["quantiles"][0] == 0.0
+    assert lorenz["quantiles"][-1] == 1.0
+

@@ -93,8 +93,9 @@ The dotted feedback edge is the single piece of magic — without it EconOS woul
 - **MARL Core**: Built on [PettingZoo](https://pettingzoo.farama.org/) and [Stable-Baselines3](https://stable-baselines3.readthedocs.io/).
 - **Economic Invariants**: Mathematically verified closed-loop economy (No money leakage).
 - **Process Explorer**: Monitor agent "memory" (wealth) and "status" (RL policy state) in real-time.
-- **Root Shell**: Interactive terminal for kernel commands and policy overrides.
-- **Deep Macro Analytics**: Real-time Gini Index, Lorenz Curves, and CPI tracking.
+- **Root Shell**: Interactive terminal for kernel commands (`tax`, `shock`, `redistribute`), policy overrides, and Fed mode.
+- **UBI Fiscal Mechanics**: Universal Basic Income redistribution command (`redistribute`) disbursing treasury tax revenue to active consumer agents.
+- **Deep Macro Analytics**: Real-time Gini Index, Lorenz Curves, CPI tracking, and Real GDP calculation.
 
 ## Architecture
 
