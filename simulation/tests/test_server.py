@@ -1,11 +1,12 @@
 """Tests for the EconOS FastAPI web server, WebSocket layer, and KernelService tick loop."""
 import asyncio
 import json
+
 import pytest
 from fastapi.testclient import TestClient
 
-from server.main import app, _ack
-from server.kernel import _try_load_ppo, KernelService
+from server.kernel import KernelService, _try_load_ppo
+from server.main import _ack, app
 
 
 def test_healthz_endpoint():

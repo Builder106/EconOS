@@ -12,6 +12,7 @@ writer means tick frames and acks can never interleave bytes on the wire.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import os
 from contextlib import asynccontextmanager
@@ -36,7 +37,10 @@ DASHBOARD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dashbo
 #   per branch). Example:
 #     ALLOWED_ORIGIN_REGEX=^https://econ-os-git-[a-z0-9-]+-[a-z0-9-]+\.vercel\.app$
 _origins_env = os.environ.get("ALLOWED_ORIGINS", "*").strip()
-ALLOWED_ORIGINS = ["*"] if _origins_env == "*" else [o.strip() for o in _origins_env.split(",") if o.strip()]
+ALLOWED_ORIGINS = (
+    ["*"] if _origins_env == "*"
+    else [o.strip() for o in _origins_env.split(",") if o.strip()]
+)
 ALLOWED_ORIGIN_REGEX = os.environ.get("ALLOWED_ORIGIN_REGEX", "").strip() or None
 
 kernel = KernelService()
@@ -95,25 +99,23 @@ async def ws(websocket: WebSocket):
                 try:
                     msg = json.loads(raw)
                 except json.JSONDecodeError:
-                    try:
+                    with contextlib.suppress(asyncio.QueueFull):
                         out_queue.put_nowait(_ack(None, ok=False, error="invalid JSON"))
-                    except asyncio.QueueFull:
-                        pass
                     continue
 
                 if msg.get("type") == "cmd":
                     result = dispatch(kernel, conn, msg.get("line", ""))
-                    try:
+                    with contextlib.suppress(asyncio.QueueFull):
                         out_queue.put_nowait(_ack(msg.get("id"), **result))
-                    except asyncio.QueueFull:
-                        pass
                 else:
-                    try:
+                    with contextlib.suppress(asyncio.QueueFull):
                         out_queue.put_nowait(
-                            _ack(msg.get("id"), ok=False, error=f"unknown msg type: {msg.get('type')}")
+                            _ack(
+                                msg.get("id"),
+                                ok=False,
+                                error=f"unknown msg type: {msg.get('type')}",
+                            )
                         )
-                    except asyncio.QueueFull:
-                        pass
         except WebSocketDisconnect:
             pass
 

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def utility_function(consumption, labor, alpha=0.7):
     """
     Cobb-Douglas Utility: U = (C^alpha) * ((1-L)^(1-alpha))
@@ -45,7 +46,7 @@ def calculate_lorenz_curve(wealths, num_points=10):
     cum_w = np.cumsum(sorted_w) / total_w
     cum_w = np.insert(cum_w, 0, 0.0)
     pop_pct = np.linspace(0.0, 1.0, len(cum_w))
-    
+
     # Interpolate to uniform grid of num_points
     grid_pop = np.linspace(0.0, 1.0, num_points + 1)
     grid_cum_w = np.interp(grid_pop, pop_pct, cum_w)

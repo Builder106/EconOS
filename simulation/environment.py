@@ -1,13 +1,23 @@
 import functools
 from typing import ClassVar
+
 import numpy as np
 from gymnasium.spaces import Box
 from pettingzoo import ParallelEnv
 
+
 class MarketEnv(ParallelEnv):
     metadata: ClassVar[dict] = {"render_modes": ["human"], "name": "market_v0"}
 
-    def __init__(self, num_consumers=10, num_producers=2, max_cycles=100, agent_filter=None, render_mode=None, tax_rate=0.0):
+    def __init__(
+        self,
+        num_consumers=10,
+        num_producers=2,
+        max_cycles=100,
+        agent_filter=None,
+        render_mode=None,
+        tax_rate=0.0,
+    ):
         self.num_consumers = num_consumers
         self.num_producers = num_producers
         self.max_cycles = max_cycles
@@ -26,7 +36,9 @@ class MarketEnv(ParallelEnv):
         else:
             self.possible_agents = all_agents
 
-        self.agent_name_mapping = dict(zip(self.possible_agents, range(len(self.possible_agents))))
+        self.agent_name_mapping = dict(
+            zip(self.possible_agents, range(len(self.possible_agents)), strict=False)
+        )
 
     def set_tax_rate(self, rate):
         self.tax_rate = float(np.clip(rate, 0.0, 1.0))
@@ -40,12 +52,12 @@ class MarketEnv(ParallelEnv):
         """Cobb-Douglas utility: C^0.7 * (1-L)^0.3"""
         return float((consumption ** 0.7) * ((1.0 - labor) ** 0.3))
 
-    @functools.lru_cache(maxsize=None)  # noqa: B019
+    @functools.lru_cache(maxsize=None)
     def observation_space(self, agent):
         # [normalized_prev_wage, normalized_prev_price, normalized_balance]
         return Box(low=0, high=1, shape=(3,), dtype=np.float32)
 
-    @functools.lru_cache(maxsize=None)  # noqa: B019
+    @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
         if "consumer" in agent:
             # [labor (0-1), consumption_percent (0-1)]
@@ -110,7 +122,9 @@ class MarketEnv(ParallelEnv):
             if kind == "wage":
                 self.market_wage = float(np.clip(self.market_wage * (1.0 + magnitude), 1.0, 100.0))
             elif kind == "price":
-                self.market_price = float(np.clip(self.market_price * (1.0 + magnitude), 1.0, 100.0))
+                self.market_price = float(
+                    np.clip(self.market_price * (1.0 + magnitude), 1.0, 100.0)
+                )
         self._pending_shocks = []
 
         # 1. Update Market Parameters based on Producer actions
@@ -119,22 +133,24 @@ class MarketEnv(ParallelEnv):
             # Producers adjust wage and price by a percentage
             avg_wage_adj = np.mean([a[0] for a in producer_actions]) * 2.0 - 1.0 # [-1, 1]
             avg_price_adj = np.mean([a[1] for a in producer_actions]) * 2.0 - 1.0 # [-1, 1]
-            
+
             self.market_wage *= (1.0 + avg_wage_adj * 0.1) # Max 10% change
             self.market_price *= (1.0 + avg_price_adj * 0.1)
-            
+
             # Keep within bounds
             self.market_wage = np.clip(self.market_wage, 1.0, 100.0)
             self.market_price = np.clip(self.market_price, 1.0, 100.0)
 
         # 2. Economic Logic Phase
         rewards = {}
-        
+
         # Calculate Total Labor and Total Consumption
         total_labor = sum([actions[a][0] for a in self.agents if "consumer" in a])
         total_wage_bill = total_labor * self.market_wage
-        total_consumption_spend = sum([actions[a][1] * self.agent_balances[a] for a in self.agents if "consumer" in a])
-        
+        total_consumption_spend = sum(
+            [actions[a][1] * self.agent_balances[a] for a in self.agents if "consumer" in a]
+        )
+
         self.last_consumption_spend = float(total_consumption_spend)
         self.last_cpi = float((self.market_price / self.base_price) * 100.0)
         cpi_ratio = self.last_cpi / 100.0
@@ -156,27 +172,27 @@ class MarketEnv(ParallelEnv):
 
                 actual_consumption = consumption_intent / (self.market_price + 1e-6)
                 rewards[agent] = self._calculate_utility(actual_consumption, labor)
-        
+
         # 2b. Update Producers
         for agent in self.agents:
             if "producer" in agent:
                 prev_balance = self.agent_balances[agent]
-                
+
                 # Revenue from consumption - Costs from wages
                 # Distributed equally among producers for simplicity
                 share_of_revenue = total_consumption_spend / self.num_producers
                 share_of_costs = total_wage_bill / self.num_producers
-                
+
                 self.agent_balances[agent] += share_of_revenue - share_of_costs
                 self.agent_balances[agent] = max(0, self.agent_balances[agent])
-                
+
                 rewards[agent] = float(self.agent_balances[agent] - prev_balance)
 
         self.num_cycles += 1
         env_truncation = self.num_cycles >= self.max_cycles
         truncations = {agent: env_truncation for agent in self.agents}
         terminations = {agent: False for agent in self.agents}
-        
+
         observations = {agent: self._get_obs(agent) for agent in self.agents}
 
         return observations, rewards, terminations, truncations, self.infos

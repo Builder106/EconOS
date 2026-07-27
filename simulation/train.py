@@ -1,8 +1,10 @@
-import os
 import json
+import os
+
 from stable_baselines3 import PPO
-from simulation.gym_wrapper import MarketGymEnv
+
 from simulation.environment import MarketEnv
+from simulation.gym_wrapper import MarketGymEnv
 from simulation.logic import calculate_gini
 
 MODELS_DIR = "models"

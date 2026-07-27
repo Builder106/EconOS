@@ -1,6 +1,8 @@
 import gymnasium as gym
 import numpy as np
+
 from simulation.environment import MarketEnv
+
 
 class MarketGymEnv(gym.Env):
     """
@@ -27,11 +29,11 @@ class MarketGymEnv(gym.Env):
         # (Parameter sharing)
         actions = {agent: action for agent in self.agents}
         obs, rewards, terminations, truncations, _infos = self.env.step(actions)
-        
+
         # Return the average reward and common obs for the next step
         avg_reward = np.mean(list(rewards.values()))
         done = all(terminations.values())
         truncated = all(truncations.values())
-        
+
         self.last_obs = obs
         return obs[self.agents[0]], avg_reward, done, truncated, {}

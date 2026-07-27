@@ -7,13 +7,18 @@ already-running economy mid-stream.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import os
 import time
-from typing import Optional, Set
 
 from simulation.environment import MarketEnv
-from simulation.logic import calculate_gini, calculate_lorenz_curve, calculate_cpi, calculate_real_gdp
+from simulation.logic import (
+    calculate_cpi,
+    calculate_gini,
+    calculate_lorenz_curve,
+    calculate_real_gdp,
+)
 
 CONSUMER_MODEL_PATH = os.environ.get("CONSUMER_MODEL", "models/consumer_policy.zip")
 PRODUCER_MODEL_PATH = os.environ.get("PRODUCER_MODEL", "models/producer_policy.zip")
@@ -27,7 +32,7 @@ def _try_load_ppo(path: str):
     try:
         from stable_baselines3 import PPO
         return PPO.load(path)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print(f"[kernel] failed to load {path}: {exc}", flush=True)
         return None
 
@@ -40,12 +45,12 @@ class KernelService:
         self.env.reset()
         self.consumer_model = _try_load_ppo(CONSUMER_MODEL_PATH)
         self.producer_model = _try_load_ppo(PRODUCER_MODEL_PATH)
-        self.subscribers: Set[asyncio.Queue] = set()
+        self.subscribers: set[asyncio.Queue] = set()
         self.paused = False
         self.last_rewards: dict = {}
         self.uptime_seconds = 0.0
         self._started_at = time.monotonic()
-        self._task: Optional[asyncio.Task] = None
+        self._task: asyncio.Task | None = None
 
     @property
     def policies_loaded(self) -> bool:
@@ -66,10 +71,8 @@ class KernelService:
     async def stop(self) -> None:
         if self._task is not None:
             self._task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError, Exception):
                 await self._task
-            except (asyncio.CancelledError, Exception):  # noqa: BLE001, S110
-                pass
 
     def _act(self, agent: str, obs):
         model = self.consumer_model if "consumer" in agent else self.producer_model
@@ -98,9 +101,21 @@ class KernelService:
             },
             "metrics": {
                 "gini": float(calculate_gini(consumer_balances)) if consumer_balances else 0.0,
-                "cpi": float(calculate_cpi(self.env.market_price, getattr(self.env, "base_price", 10.0))),
-                "real_gdp": float(calculate_real_gdp(getattr(self.env, "last_consumption_spend", 0.0), self.env.market_price, getattr(self.env, "base_price", 10.0))),
-                "lorenz_curve": calculate_lorenz_curve(consumer_balances) if consumer_balances else {"quantiles": [], "cumulative_wealth": []},
+                "cpi": float(
+                    calculate_cpi(self.env.market_price, getattr(self.env, "base_price", 10.0))
+                ),
+                "real_gdp": float(
+                    calculate_real_gdp(
+                        getattr(self.env, "last_consumption_spend", 0.0),
+                        self.env.market_price,
+                        getattr(self.env, "base_price", 10.0),
+                    )
+                ),
+                "lorenz_curve": (
+                    calculate_lorenz_curve(consumer_balances)
+                    if consumer_balances
+                    else {"quantiles": [], "cumulative_wealth": []}
+                ),
                 "total_money": float(sum(balances) + self.env.treasury),
                 "treasury": float(self.env.treasury),
             },

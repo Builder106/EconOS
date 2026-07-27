@@ -1,0 +1,31 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+# Select only the rule families that were passing before the ruff upgrade.
+# Expand this list deliberately, not by upgrading ruff and hoping for the best.
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    # B019: lru_cache on methods — PettingZoo's ParallelEnv API requires this pattern.
+    "B019",
+    # SIM117: collapse nested `with` blocks — nested form is clearer in test helpers.
+    "SIM117",
+    # RUF012: mutable class-variable default — metadata dict is intentional class-var.
+    "RUF012",
+    # BLE001: blind Exception catch — needed for graceful task-cancellation teardown.
+    "BLE001",
+    # S110: try-except-pass — deliberate in async stop() and PPO load fallback.
+    "S110",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["server", "simulation"]

@@ -13,8 +13,8 @@ from __future__ import annotations
 
 import os
 import shlex
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Dict, List
 
 from simulation.logic import calculate_gini
 
@@ -39,7 +39,7 @@ class Command:
     handler: Callable[..., dict]
 
 
-COMMANDS: Dict[str, Command] = {}
+COMMANDS: dict[str, Command] = {}
 
 
 def _register(name: str, requires_admin: bool, summary: str):
@@ -52,7 +52,7 @@ def _register(name: str, requires_admin: bool, summary: str):
 # ---------- public commands ----------
 
 @_register("help", False, "list commands")
-def _cmd_help(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_help(kernel, conn: Connection, args: list[str]) -> dict:
     lines = ["EconOS shell — commands:"]
     for c in COMMANDS.values():
         marker = "[admin]" if c.requires_admin else "       "
@@ -61,20 +61,20 @@ def _cmd_help(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("who", False, "show your session info")
-def _cmd_who(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_who(kernel, conn: Connection, args: list[str]) -> dict:
     role = "admin" if conn.is_admin else "visitor"
     return {"output": f"role={role}  step={kernel.env.num_cycles}  uptime_s={kernel.snapshot()['uptime_s']}"}
 
 
 @_register("gini", False, "current consumer-wealth Gini")
-def _cmd_gini(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_gini(kernel, conn: Connection, args: list[str]) -> dict:
     cb = [kernel.env.agent_balances[a] for a in kernel.env.agents if "consumer" in a]
     g = calculate_gini(cb) if cb else 0.0
     return {"output": f"gini = {g:.4f}"}
 
 
 @_register("inspect", False, "inspect <agent_id>")
-def _cmd_inspect(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_inspect(kernel, conn: Connection, args: list[str]) -> dict:
     if not args:
         raise CommandError("usage: inspect <agent_id>")
     agent_id = args[0]
@@ -87,7 +87,7 @@ def _cmd_inspect(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("top", False, "top [N] agents by balance (default 5)")
-def _cmd_top(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_top(kernel, conn: Connection, args: list[str]) -> dict:
     try:
         n = int(args[0]) if args else 5
     except ValueError:
@@ -100,7 +100,7 @@ def _cmd_top(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("sudo", False, "sudo <token> — elevate this session to admin")
-def _cmd_sudo(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_sudo(kernel, conn: Connection, args: list[str]) -> dict:
     if not args:
         raise CommandError("usage: sudo <token>")
     if not ADMIN_TOKEN:
@@ -118,21 +118,21 @@ def _parse_pct(s: str) -> float:
 
 
 @_register("pause", True, "pause the kernel tick loop")
-def _cmd_pause(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_pause(kernel, conn: Connection, args: list[str]) -> dict:
     kernel.cmd_pause()
     kernel.broadcast_event({"type": "event", "kind": "paused", "by": "admin", "detail": {}})
     return {"output": "paused."}
 
 
 @_register("resume", True, "resume the kernel tick loop")
-def _cmd_resume(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_resume(kernel, conn: Connection, args: list[str]) -> dict:
     kernel.cmd_resume()
     kernel.broadcast_event({"type": "event", "kind": "resumed", "by": "admin", "detail": {}})
     return {"output": "resumed."}
 
 
 @_register("tax", True, "tax <pct> — set income tax rate (0–100)")
-def _cmd_tax(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_tax(kernel, conn: Connection, args: list[str]) -> dict:
     if not args:
         raise CommandError("usage: tax <pct>   (0-100)")
     try:
@@ -150,7 +150,7 @@ def _cmd_tax(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("redistribute", True, "redistribute — disburse treasury to consumers as UBI")
-def _cmd_redistribute(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_redistribute(kernel, conn: Connection, args: list[str]) -> dict:
     res = kernel.cmd_redistribute()
     kernel.broadcast_event({
         "type": "event", "kind": "ubi_redistributed", "by": "admin",
@@ -160,7 +160,7 @@ def _cmd_redistribute(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("shock", True, "shock <wage|price> <pct> — one-shot multiplicative")
-def _cmd_shock(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_shock(kernel, conn: Connection, args: list[str]) -> dict:
     if len(args) < 2:
         raise CommandError("usage: shock <wage|price> <pct>")
     kind, pct_s = args[0], args[1]
@@ -181,7 +181,7 @@ def _cmd_shock(kernel, conn: Connection, args: List[str]) -> dict:
 
 
 @_register("reset", True, "reset the simulation")
-def _cmd_reset(kernel, conn: Connection, args: List[str]) -> dict:
+def _cmd_reset(kernel, conn: Connection, args: list[str]) -> dict:
     kernel.cmd_reset()
     kernel.broadcast_event({"type": "event", "kind": "reset", "by": "admin", "detail": {}})
     return {"output": "kernel reset."}
