@@ -44,7 +44,9 @@ COMMANDS: dict[str, Command] = {}
 
 def _register(name: str, requires_admin: bool, summary: str):
     def deco(fn):
-        COMMANDS[name] = Command(name=name, requires_admin=requires_admin, summary=summary, handler=fn)
+        COMMANDS[name] = Command(
+            name=name, requires_admin=requires_admin, summary=summary, handler=fn
+        )
         return fn
     return deco
 
@@ -63,7 +65,8 @@ def _cmd_help(kernel, conn: Connection, args: list[str]) -> dict:
 @_register("who", False, "show your session info")
 def _cmd_who(kernel, conn: Connection, args: list[str]) -> dict:
     role = "admin" if conn.is_admin else "visitor"
-    return {"output": f"role={role}  step={kernel.env.num_cycles}  uptime_s={kernel.snapshot()['uptime_s']}"}
+    uptime = kernel.snapshot()['uptime_s']
+    return {"output": f"role={role}  step={kernel.env.num_cycles}  uptime_s={uptime}"}
 
 
 @_register("gini", False, "current consumer-wealth Gini")
@@ -90,8 +93,8 @@ def _cmd_inspect(kernel, conn: Connection, args: list[str]) -> dict:
 def _cmd_top(kernel, conn: Connection, args: list[str]) -> dict:
     try:
         n = int(args[0]) if args else 5
-    except ValueError:
-        raise CommandError("top expects an integer count")
+    except ValueError as e:
+        raise CommandError("top expects an integer count") from e
     if not (1 <= n <= 100):
         raise CommandError("top N must be in [1, 100]")
     ranked = sorted(kernel.env.agent_balances.items(), key=lambda kv: kv[1], reverse=True)
@@ -99,7 +102,7 @@ def _cmd_top(kernel, conn: Connection, args: list[str]) -> dict:
     return {"output": "\n".join(lines)}
 
 
-@_register("sudo", False, "sudo <token> — elevate this session to admin")
+@_register("sudo", False, "sudo <token> - elevate this session to admin")
 def _cmd_sudo(kernel, conn: Connection, args: list[str]) -> dict:
     if not args:
         raise CommandError("usage: sudo <token>")
@@ -131,14 +134,14 @@ def _cmd_resume(kernel, conn: Connection, args: list[str]) -> dict:
     return {"output": "resumed."}
 
 
-@_register("tax", True, "tax <pct> — set income tax rate (0–100)")
+@_register("tax", True, "tax <pct> - set income tax rate (0-100)")
 def _cmd_tax(kernel, conn: Connection, args: list[str]) -> dict:
     if not args:
         raise CommandError("usage: tax <pct>   (0-100)")
     try:
         pct = _parse_pct(args[0])
-    except ValueError:
-        raise CommandError("tax pct must be numeric")
+    except ValueError as e:
+        raise CommandError("tax pct must be numeric") from e
     if not (0.0 <= pct <= 100.0):
         raise CommandError("tax pct must be in [0, 100]")
     result = kernel.cmd_set_tax(pct / 100.0)
@@ -156,7 +159,12 @@ def _cmd_redistribute(kernel, conn: Connection, args: list[str]) -> dict:
         "type": "event", "kind": "ubi_redistributed", "by": "admin",
         "detail": {"total": res["total"], "per_consumer": res["per_consumer"]},
     })
-    return {"output": f"disbursed {res['total']:.2f} treasury ({res['per_consumer']:.2f} per consumer) as UBI."}
+    return {
+        "output": (
+            f"disbursed {res['total']:.2f} treasury "
+            f"({res['per_consumer']:.2f} per consumer) as UBI."
+        )
+    }
 
 
 @_register("shock", True, "shock <wage|price> <pct> — one-shot multiplicative")
@@ -168,8 +176,8 @@ def _cmd_shock(kernel, conn: Connection, args: list[str]) -> dict:
         raise CommandError("shock target must be 'wage' or 'price'")
     try:
         pct = _parse_pct(pct_s)
-    except ValueError:
-        raise CommandError("shock magnitude must be numeric")
+    except ValueError as e:
+        raise CommandError("shock magnitude must be numeric") from e
     if not (-50.0 <= pct <= 50.0):
         raise CommandError("shock magnitude must be in [-50, 50] %")
     kernel.cmd_shock(kind, pct / 100.0)
@@ -208,6 +216,6 @@ def dispatch(kernel, conn: Connection, line: str) -> dict:
         result = cmd.handler(kernel, conn, args)
     except CommandError as e:
         return {"ok": False, "error": str(e)}
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         return {"ok": False, "error": f"internal error: {e}"}
     return {"ok": True, **result}

@@ -132,7 +132,9 @@ def test_ubi_redistribution():
         assert per_consumer == pytest.approx(initial_treasury / 10.0)
 
         consumer_balances_after = [env.agent_balances[c] for c in env.agents if "consumer" in c]
-        for b_before, b_after in zip(consumer_balances_before, consumer_balances_after, strict=True):
+        for b_before, b_after in zip(
+            consumer_balances_before, consumer_balances_after, strict=True
+        ):
             assert b_after == pytest.approx(b_before + per_consumer)
 
 def test_macro_analytics():
