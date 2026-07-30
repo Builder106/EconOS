@@ -1,3 +1,36 @@
+[project]
+name = "econ-os"
+version = "0.1.0"
+description = "Multi-agent macroeconomic simulation kernel & interactive dashboard."
+requires-python = ">=3.11"
+dependencies = [
+    "pettingzoo",
+    "supersuit",
+    "stable-baselines3",
+    "gymnasium",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "httpx",
+    "fastapi",
+    "uvicorn[standard]",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+    "ruff",
+]
+
+[tool.uv]
+package = false
+default-groups = []
+
+[tool.setuptools]
+py-modules = []
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100

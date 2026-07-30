@@ -2,17 +2,17 @@
 # Koyeb (and any container host) sets $PORT; uvicorn binds to it.
 
 FROM python:3.11-slim AS base
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    UV_LINK_MODE=copy
 
 WORKDIR /app
 
 # Install Python deps first for better layer caching.
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN uv pip install --system --no-cache .
 
 # Copy the kernel and the simulation core. Dashboard is shipped via Vercel in
 # the split-host deploy, but we bundle it here too so this image works

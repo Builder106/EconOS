@@ -30,9 +30,7 @@ update both sides in the same PR.
 
 ```bash
 # Python side (kernel)
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync --group dev
 
 # Node side (frontend tests / OG regen / demo recording)
 npm install
