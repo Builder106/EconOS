@@ -622,9 +622,9 @@ sudo &lt;token&gt;          # Fed mode (admin)</pre>
                 </div>
 
                 <div class="border-t border-white/10 pt-3 flex justify-between items-center">
-                    <a href="https://github.com/Builder106/EconOS" target="_blank" rel="noopener"
+                    <a href="https://github.com/Builder106/econ-os" target="_blank" rel="noopener"
                        class="text-terminal-cyan hover:text-white text-[13px] underline">
-                        github.com/Builder106/EconOS &rarr;
+                        github.com/Builder106/econ-os &rarr;
                     </a>
                     <span class="text-white/45 text-[12px] italic">close to dismiss</span>
                 </div>

@@ -8,10 +8,10 @@
 
 # EconOS | Economic Operating System
 
-[![CI — pytest + Playwright](https://github.com/Builder106/EconOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/EconOS/actions/workflows/ci.yml)
+[![CI — pytest + Playwright](https://github.com/Builder106/econ-os/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-23%20passing-success)](https://github.com/Builder106/EconOS/actions/workflows/ci.yml)
+[![tests](https://img.shields.io/badge/tests-23%20passing-success)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml)
 [![MARL](https://img.shields.io/badge/MARL-PettingZoo%20%2B%20PPO-FF6F00)](https://pettingzoo.farama.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-WebSocket-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Live demo](https://img.shields.io/badge/demo-econ--os.vercel.app-00FF41)](https://econ-os.vercel.app)
@@ -139,7 +139,7 @@ flowchart LR
 
 | Stage | Trigger | What runs | Wall-clock (warm cache) | Where it shows up |
 |---|---|---|---|---|
-| **CI · pytest** | push to `main`, every PR | env + command-dispatch tests | ~30 s | [Actions tab](https://github.com/Builder106/EconOS/actions) + green badge |
+| **CI · pytest** | push to `main`, every PR | env + command-dispatch tests | ~30 s | [Actions tab](https://github.com/Builder106/econ-os/actions) + green badge |
 | **CI · Playwright** | push to `main`, every PR | 3 smoke + 6 admin-flow e2e | ~2 min | same |
 | **CD · Vercel (frontend)** | push to `main` | [`scripts/build-config.js`](scripts/build-config.js) writes `dashboard/config.js` from `ECONOS_KERNEL_WS_URL`; static `dashboard/` deploys | ~30 s | [econ-os.vercel.app](https://econ-os.vercel.app) |
 | **CD · kernel VM (backend)** | **manual** | SSH in, `git pull && sudo docker compose -f deploy/docker-compose.yml up -d` | ~30 s if image is cached | `wss://econos-kernel.<tailnet>.ts.net` |

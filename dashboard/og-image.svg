@@ -85,5 +85,5 @@
 
   <!-- Footer URL -->
   <text x="1120" y="590" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-        font-size="18" fill="rgba(255,255,255,0.42)" text-anchor="end">github.com/Builder106/EconOS</text>
+        font-size="18" fill="rgba(255,255,255,0.42)" text-anchor="end">github.com/Builder106/econ-os</text>
 </svg>
