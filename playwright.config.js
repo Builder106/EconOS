@@ -54,7 +54,7 @@ module.exports = defineConfig({
     },
   ],
   webServer: {
-    command: 'python3 -m uvicorn server.main:app --host 127.0.0.1 --port 8765 --log-level warning',
+    command: 'uv run uvicorn server.main:app --host 127.0.0.1 --port 8765 --log-level warning',
     url: 'http://127.0.0.1:8765/healthz',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
