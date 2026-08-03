@@ -16,6 +16,17 @@ permissions:
   contents: read
 
 jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_NOTIFY_USER_LIST: ""
+
   pytest:
     name: pytest (env + commands)
     runs-on: ubuntu-latest
@@ -29,6 +40,9 @@ jobs:
 
       - name: Install Python deps
         run: uv sync --frozen --group dev
+
+      - name: Python dependency audit
+        run: uv run --with pip-audit pip-audit
 
       - name: Lint with Ruff
         run: uv run --frozen ruff check server simulation
@@ -60,6 +74,9 @@ jobs:
 
       - name: Install npm deps
         run: npm ci
+
+      - name: Node dependency audit
+        run: npm audit --audit-level=high
 
       # Cache Playwright's downloaded Chromium binary across runs (~250 MB).
       # Key on package-lock so an upgrade busts the cache automatically.
