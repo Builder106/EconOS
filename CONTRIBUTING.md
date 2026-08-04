@@ -60,7 +60,7 @@ yet; reviewers run them locally.
 ## Common dev tasks
 
 | What | How |
-|---|---|
+| --- | --- |
 | Regenerate the OG image after editing `og-image.svg` | `node scripts/build-og-image.js` |
 | Regenerate README demo GIFs | `./scripts/record-demos.sh` (needs `ffmpeg`) |
 | Train fresh PPO policies | `python3 -m simulation.train` (commits to `models/*.zip`, gitignored) |

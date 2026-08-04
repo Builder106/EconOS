@@ -106,11 +106,13 @@ The dotted feedback edge is the single piece of magic — without it EconOS woul
 ## Getting Started
 
 1. **Setup**:
+
    ```bash
    uv sync --group dev
    ```
 
 2. **Run Simulation**:
+
    ```bash
    python3 simulation/train.py
    ```
@@ -138,7 +140,7 @@ flowchart LR
 ```
 
 | Stage | Trigger | What runs | Wall-clock (warm cache) | Where it shows up |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **CI · pytest** | push to `main`, every PR | env + command-dispatch tests | ~30 s | [Actions tab](https://github.com/Builder106/econ-os/actions) + green badge |
 | **CI · Playwright** | push to `main`, every PR | 3 smoke + 6 admin-flow e2e | ~2 min | same |
 | **CD · Vercel (frontend)** | push to `main` | [`scripts/build-config.js`](scripts/build-config.js) writes `dashboard/config.js` from `ECONOS_KERNEL_WS_URL`; static `dashboard/` deploys | ~30 s | [econ-os.vercel.app](https://econ-os.vercel.app) |
@@ -157,6 +159,7 @@ Config lives in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (CI), [`v
 The simulation is built on formal economic objective functions, but the market dynamics are purely emergent from agent learning.
 
 ### Agent Objectives
+
 - **Consumers**: Maximize Lifetime Utility $U$ subject to budget constraints:
   $$U = \sum_{t} \gamma^t (C_t^\alpha \cdot (1 - L_t)^{1-\alpha})$$
   *Where $C$ is consumption, $L$ is labor, and $\alpha$ (~0.7) is the consumption preference.*
@@ -166,6 +169,7 @@ The simulation is built on formal economic objective functions, but the market d
   *Where $A$ is technology efficiency and $\beta$ is the returns to scale.*
 
 ### Key Observations
+
 1. **Price Discovery**: Agents successfully find a stable price-wage ratio within 5,000 timesteps of PPO training.
 2. **Shock Response**: When "God Mode" policy shifts are applied (e.g., higher taxes), agents dynamically adjust their labor supply to maintain utility levels, reflecting real-world labor elasticity.
 
