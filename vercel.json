@@ -4,5 +4,12 @@
   "outputDirectory": "dashboard",
   "installCommand": "echo 'no install needed (static)'",
   "framework": null,
-  "cleanUrls": true
+  "cleanUrls": true,
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "staging": true,
+      "*": false
+    }
+  }
 }
