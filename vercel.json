@@ -5,11 +5,5 @@
   "installCommand": "echo 'no install needed (static)'",
   "framework": null,
   "cleanUrls": true,
-  "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "staging": true,
-      "*": false
-    }
-  }
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"staging\" ]; then exit 0; else exit 1; fi"
 }
