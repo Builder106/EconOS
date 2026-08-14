@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-08-14: Accessible plain-English documentation update #decision
+
+Refactored the README introductory pitch and tagline to introduce the multi-agent economic simulator as a flight-simulator sandbox for testing economic policies. Framed the AI agents and market behavior in clear, non-specialist terms while maintaining the rigorous PPO/MARL and PettingZoo documentation.
+
 ## 2026-07-24 — UBI Treasury Redistribution and Real GDP / CPI Macro Analytics #feature #milestone
 
 Added Universal Basic Income (UBI) treasury redistribution alongside real-time macro indicators (CPI, Real GDP, and Lorenz curve quantiles). Admin users can now issue the `redistribute`command via the Fed shell, which evenly disburses accumulated income tax revenue from`env.treasury` back to active consumer agents while maintaining closed-loop money conservation. All macro metrics calculate live on each 500ms kernel tick and stream over WebSockets to all connected clients.

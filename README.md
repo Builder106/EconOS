@@ -2,13 +2,13 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/banner.png">
     <source media="(prefers-color-scheme: light)" srcset="docs/banner-light.png">
-    <img src="docs/banner.png" alt="EconOS — Economic Operating System" width="100%">
+    <img src="docs/banner.png" alt="EconOS: Economic Operating System" width="100%">
   </picture>
 </p>
 
 # EconOS | Economic Operating System
 
-[![CI — pytest + Playwright](https://github.com/Builder106/econ-os/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml)
+[![CI (pytest + Playwright)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
 [![tests](https://img.shields.io/badge/tests-23%20passing-success)](https://github.com/Builder106/econ-os/actions/workflows/ci.yml)
@@ -16,11 +16,15 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-WebSocket-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Live demo](https://img.shields.io/badge/demo-econ--os.vercel.app-00FF41)](https://econ-os.vercel.app)
 
-> **A high-fidelity Multi-Agent Reinforcement Learning (MARL) desktop environment for decentralized economic simulation.**
+> **A virtual sandbox economy powered by learning AI citizens.** Test financial policies, tax rates, and market rules in real time.
 
-EconOS is a sophisticated "Operating System" for market simulations. It treats economic agents as system processes, providing a unique, glassmorphic desktop interface to monitor and interact with emergent market behaviors. Using state-of-the-art RL (PPO), agents discover optimal pricing, wage-setting, and consumption strategies within a closed-loop economy.
+## 💡 What is EconOS?
 
-**Live demo:**[econ-os.vercel.app](https://econ-os.vercel.app) — multi-tenant, shared mainframe. Every visitor sees the same simulation in real time. Dashboard ships with**dark + light themes** (cycles via the taskbar moon icon, defaults to your OS preference) — and the demo GIFs below auto-match your browser theme via `<picture>`+`prefers-color-scheme`.
+Testing new economic policies in the real world is unpredictable. EconOS creates a virtual world populated by dozens of independent AI agents acting as buyers, sellers, and workers. It provides a flight-simulator dashboard for researchers to test rules, tax rates, and market shocks safely before applying them in real life.
+
+EconOS treats economic agents as system processes, providing a glassmorphic desktop interface to monitor and interact with emergent market behaviors. Using reinforcement learning (PPO), agents discover pricing, wage-setting, and consumption strategies within a closed-loop economy.
+
+**Live demo:** [econ-os.vercel.app](https://econ-os.vercel.app) (multi-tenant shared mainframe where every visitor observes the simulation in real time). The dashboard ships with dark and light themes that cycle via the taskbar moon icon.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/01-boot-and-live-dark.gif">
