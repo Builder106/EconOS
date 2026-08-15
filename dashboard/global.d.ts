@@ -1,13 +1,31 @@
+export interface EconWindowManager {
+  focusWindow?: (w: unknown) => void;
+  openWindow?: (appId: string, options?: Record<string, unknown>) => void;
+  closeWindow?: (windowId: string) => void;
+  [key: string]: unknown;
+}
+
+export interface EconKernelClient {
+  isConnected?: boolean;
+  connect?: () => void;
+  disconnect?: () => void;
+  send?: (data: unknown) => void;
+  [key: string]: unknown;
+}
+
+export type VercelAnalyticsFn = (event: string, properties?: Record<string, unknown>) => void;
+
 declare global {
   interface Window {
-    econWM: any;
-    kernelClient: any;
-    launchWindow: any;
-    startTour: any;
-    cycleTheme: any;
-    va: any;
-    ECONOS_KERNEL_WS_URL: any;
-    Chart: any;
+    econWM?: EconWindowManager;
+    kernelClient?: EconKernelClient;
+    launchWindow?: (appId: string, options?: Record<string, unknown>) => void;
+    startTour?: () => void;
+    cycleTheme?: () => void;
+    va?: VercelAnalyticsFn;
+    ECONOS_KERNEL_WS_URL?: string;
+    Chart?: unknown;
   }
 }
+
 export {};
