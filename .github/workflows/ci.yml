@@ -28,8 +28,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_NOTIFY_USER_LIST: ""
 
+  commitlint:
+    name: Commit message lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v6
+
   pytest:
-    name: pytest (env + commands)
+    name: pytest (env + commands) & build / license checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -44,6 +54,12 @@ jobs:
 
       - name: Python dependency audit
         run: uv run --with pip-audit pip-audit
+
+      - name: License compliance check
+        run: uv run --with pip-licenses pip-licenses --fail-on="AGPL;GPL"
+
+      - name: Package build check
+        run: uv build --no-sources || uv build
 
       - name: Lint with Ruff
         run: uv run --frozen ruff check server simulation
