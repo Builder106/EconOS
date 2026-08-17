@@ -21,28 +21,21 @@
     <line x1="0" y1="240" x2="1280" y2="240"/>
   </g>
 
-  <!-- Status strip — forest green dot + caption (light-theme green) -->
-  <g transform="translate(70, 56)">
-    <circle cx="0" cy="-4" r="5" fill="#0E7A2A"/>
-    <text x="14" y="0" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-          font-size="12" fill="rgba(20,24,32,0.65)" letter-spacing="3.5">LIVE · MULTI-TENANT · SHARED MAINFRAME</text>
-  </g>
-
   <!-- EconOS wordmark — darker teal for paper contrast -->
-  <text x="70" y="180" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+  <text x="70" y="160" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
         font-size="108" font-weight="800" fill="#006B7A" letter-spacing="-3">EconOS</text>
 
   <!-- Subtitle, monospace, tracked-out -->
-  <text x="74" y="212" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-        font-size="14" fill="rgba(20,24,32,0.62)" letter-spacing="5">ECONOMIC · OPERATING · SYSTEM</text>
+  <text x="74" y="196" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
+        font-size="14" fill="rgba(20,24,32,0.62)" letter-spacing="5">ECONOMIC OPERATING SYSTEM</text>
 
   <!-- Tagline -->
-  <text x="70" y="258" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+  <text x="70" y="244" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
         font-size="20" font-weight="500" fill="rgba(20,24,32,0.85)">A live multi-agent RL economy running as a shared mainframe.</text>
 
   <!-- Stack line -->
-  <text x="70" y="284" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
-        font-size="13" fill="rgba(20,24,32,0.55)">12 agents · PettingZoo + PPO · FastAPI · WebSocket fan-out</text>
+  <text x="70" y="276" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+        font-size="13" fill="rgba(20,24,32,0.55)">12 agents | PettingZoo + PPO | FastAPI | WebSocket fan-out</text>
 
   <!-- Macro Monitor mock panel (right) — light-theme chart colors -->
   <g transform="translate(810, 50)">
@@ -50,10 +43,7 @@
           fill="rgba(0,107,122,0.04)" stroke="rgba(0,107,122,0.28)" stroke-width="1"/>
 
     <text x="14" y="22" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-          font-size="10" fill="rgba(20,24,32,0.5)" letter-spacing="2.5">MARKET · WAGE / PRICE</text>
-    <circle cx="378" cy="18" r="3.5" fill="#0E7A2A"/>
-    <text x="370" y="22" font-family="ui-monospace, monospace" font-size="10"
-          fill="#0E7A2A" text-anchor="end" letter-spacing="2">LIVE</text>
+          font-size="10" fill="rgba(20,24,32,0.5)" letter-spacing="2.5">MARKET | WAGE / PRICE</text>
 
     <g stroke="rgba(20,24,32,0.08)" stroke-width="1">
       <line x1="20" y1="70"  x2="380" y2="70"/>

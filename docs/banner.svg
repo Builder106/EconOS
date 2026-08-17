@@ -21,28 +21,21 @@
     <line x1="0" y1="240" x2="1280" y2="240"/>
   </g>
 
-  <!-- Status strip — green dot + caption -->
-  <g transform="translate(70, 56)">
-    <circle cx="0" cy="-4" r="5" fill="#00FF41"/>
-    <text x="14" y="0" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-          font-size="12" fill="rgba(255,255,255,0.55)" letter-spacing="3.5">LIVE · MULTI-TENANT · SHARED MAINFRAME</text>
-  </g>
-
   <!-- EconOS wordmark -->
-  <text x="70" y="180" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+  <text x="70" y="160" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
         font-size="108" font-weight="800" fill="#00F5FF" letter-spacing="-3">EconOS</text>
 
   <!-- Subtitle, monospace, tracked-out -->
-  <text x="74" y="212" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-        font-size="14" fill="rgba(255,255,255,0.55)" letter-spacing="5">ECONOMIC · OPERATING · SYSTEM</text>
+  <text x="74" y="196" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
+        font-size="14" fill="rgba(255,255,255,0.55)" letter-spacing="5">ECONOMIC OPERATING SYSTEM</text>
 
   <!-- Tagline -->
-  <text x="70" y="258" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+  <text x="70" y="244" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
         font-size="20" font-weight="500" fill="rgba(255,255,255,0.82)">A live multi-agent RL economy running as a shared mainframe.</text>
 
   <!-- Stack line -->
-  <text x="70" y="284" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
-        font-size="13" fill="rgba(255,255,255,0.5)">12 agents · PettingZoo + PPO · FastAPI · WebSocket fan-out</text>
+  <text x="70" y="276" font-family="Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+        font-size="13" fill="rgba(255,255,255,0.5)">12 agents | PettingZoo + PPO | FastAPI | WebSocket fan-out</text>
 
   <!-- Macro Monitor mock panel (right) -->
   <g transform="translate(810, 50)">
@@ -51,10 +44,7 @@
 
     <!-- Header -->
     <text x="14" y="22" font-family="ui-monospace, Menlo, Monaco, 'JetBrains Mono', monospace"
-          font-size="10" fill="rgba(255,255,255,0.42)" letter-spacing="2.5">MARKET · WAGE / PRICE</text>
-    <circle cx="378" cy="18" r="3.5" fill="#00FF41"/>
-    <text x="370" y="22" font-family="ui-monospace, monospace" font-size="10"
-          fill="#00FF41" text-anchor="end" letter-spacing="2">LIVE</text>
+          font-size="10" fill="rgba(255,255,255,0.42)" letter-spacing="2.5">MARKET | WAGE / PRICE</text>
 
     <!-- Grid -->
     <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
