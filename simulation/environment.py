@@ -74,8 +74,6 @@ class MarketEnv(ParallelEnv):
         self.infos = {agent: {} for agent in self.agents}
         self.num_cycles = 0
 
-        # State: [Wage, Price, Balance]
-        # We start with some sensible defaults
         self.market_wage = 10.0
         self.market_price = 10.0
         self.base_price = 10.0
@@ -105,7 +103,6 @@ class MarketEnv(ParallelEnv):
         return total_disbursed, amount_per_consumer
 
     def _get_obs(self, agent):
-        # Simple normalization: divide by 100 max
         return np.array([
             self.market_wage / 100.0,
             self.market_price / 100.0,
@@ -117,7 +114,6 @@ class MarketEnv(ParallelEnv):
             self.agents = []
             return {}, {}, {}, {}, {}
 
-        # 0. Apply admin-issued shocks before normal market dynamics
         for kind, magnitude in self._pending_shocks:
             if kind == "wage":
                 self.market_wage = float(np.clip(self.market_wage * (1.0 + magnitude), 1.0, 100.0))
@@ -127,24 +123,19 @@ class MarketEnv(ParallelEnv):
                 )
         self._pending_shocks = []
 
-        # 1. Update Market Parameters based on Producer actions
         producer_actions = [actions[a] for a in self.agents if "producer" in a]
         if producer_actions:
-            # Producers adjust wage and price by a percentage
-            avg_wage_adj = np.mean([a[0] for a in producer_actions]) * 2.0 - 1.0 # [-1, 1]
-            avg_price_adj = np.mean([a[1] for a in producer_actions]) * 2.0 - 1.0 # [-1, 1]
+            avg_wage_adj = np.mean([a[0] for a in producer_actions]) * 2.0 - 1.0
+            avg_price_adj = np.mean([a[1] for a in producer_actions]) * 2.0 - 1.0
 
-            self.market_wage *= (1.0 + avg_wage_adj * 0.1) # Max 10% change
+            self.market_wage *= (1.0 + avg_wage_adj * 0.1)
             self.market_price *= (1.0 + avg_price_adj * 0.1)
 
-            # Keep within bounds
             self.market_wage = np.clip(self.market_wage, 1.0, 100.0)
             self.market_price = np.clip(self.market_price, 1.0, 100.0)
 
-        # 2. Economic Logic Phase
         rewards = {}
 
-        # Calculate Total Labor and Total Consumption
         total_labor = sum([actions[a][0] for a in self.agents if "consumer" in a])
         total_wage_bill = total_labor * self.market_wage
         total_consumption_spend = sum(
@@ -156,13 +147,11 @@ class MarketEnv(ParallelEnv):
         cpi_ratio = self.last_cpi / 100.0
         self.last_real_gdp = float(total_consumption_spend / cpi_ratio) if cpi_ratio > 0 else 0.0
 
-        # 2a. Update Consumers
         for agent in self.agents:
             if "consumer" in agent:
                 labor = actions[agent][0]
                 consumption_intent = actions[agent][1] * self.agent_balances[agent]
 
-                # Income comes from labor; tax skim goes to treasury
                 gross_income = labor * self.market_wage
                 tax_paid = gross_income * self.tax_rate
                 self.treasury += tax_paid
@@ -173,13 +162,10 @@ class MarketEnv(ParallelEnv):
                 actual_consumption = consumption_intent / (self.market_price + 1e-6)
                 rewards[agent] = self._calculate_utility(actual_consumption, labor)
 
-        # 2b. Update Producers
         for agent in self.agents:
             if "producer" in agent:
                 prev_balance = self.agent_balances[agent]
 
-                # Revenue from consumption - Costs from wages
-                # Distributed equally among producers for simplicity
                 share_of_revenue = total_consumption_spend / self.num_producers
                 share_of_costs = total_wage_bill / self.num_producers
 

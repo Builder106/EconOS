@@ -40,8 +40,8 @@ class WindowManager {
         const existing = document.getElementById(id);
         if (existing) { this.focusWindow(existing); return existing; }
 
-        // Clamp to viewport so windows never spawn (partially) offscreen on
-        // narrower displays — coords were originally tuned for 1920+ widths.
+        // Clamp to viewport so windows never spawn partially offscreen on
+        // narrower displays (coords were originally tuned for 1920+ widths).
         // 20px margin on sides; 60px reserved at the bottom for the taskbar.
         const MARGIN = 20;
         const TASKBAR_RESERVE = 60;
@@ -116,13 +116,13 @@ class WindowManager {
 }
 
 /**
- * KernelClient — single WebSocket to the shared kernel, multiplexed:
+ * KernelClient: single WebSocket to the shared kernel, multiplexed:
  *   - inbound `tick`   → state cache + .subscribe(cb) listeners
  *   - inbound `event`  → .onEvent(cb) listeners (admin shocks, resets)
  *   - inbound `ack`    → resolves the matching .sendCommand() promise
  *   - per-connection `isAdmin` flag flips on a successful `sudo` ack
  *
- * Reconnect drops admin elevation by design — the server-side connection is
+ * Reconnect drops admin elevation by design: the server-side connection is
  * gone and conn.is_admin lives there.
  */
 class KernelClient {
@@ -249,8 +249,6 @@ class KernelClient {
     }
 }
 
-// --- helpers ---
-
 /** @param {number} n */
 const fmtMoney = (n) => {
     if (n == null || isNaN(n)) return '—';
@@ -271,8 +269,6 @@ const procIdFor = (agentId) => {
 const procNameFor = (agentId) =>
     agentId.startsWith('consumer') ? 'CONSUMER_POLICY_NET' : 'PRODUCER_RL_OPTIMIZER';
 
-// --- window launchers ---
-
 _w.launchWindow = function(/** @type {string} */ type) {
     const wm = _w.econWM;
     const kc = _w.kernelClient;
@@ -282,7 +278,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
         wm.createWindow('processes', 'Process Telemetry Hub', 80, 180, 700, 520,
             `<div class="font-mono text-[12px]">
                 <div class="grid grid-cols-[60px_1fr_80px_60px_20px] gap-2 text-white/55 uppercase pb-1 border-b border-white/5 mb-2">
-                    <span data-tip="Process ID — C-* are consumers, P-* producers">PID</span>
+                    <span data-tip="Process ID: C-* are consumers, P-* producers">PID</span>
                     <span data-tip="Underlying RL policy network controlling this agent">Process</span>
                     <span data-tip="Current cash on hand for this agent">Balance</span>
                     <span data-tip="Reward signal from the most recent tick (utility for consumers, profit for producers)">Δ Reward</span>
@@ -298,7 +294,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
             if (!document.getElementById('proc-rows')) { unsub(); return; }
             if (!s) {
                 rowsEl.innerHTML = `<div class="text-white/55 italic">${
-                    connected ? 'connected — awaiting first tick…' : 'connecting to kernel…'
+                    connected ? 'connected: awaiting first tick…' : 'connecting to kernel…'
                 }</div>`;
                 return;
             }
@@ -327,7 +323,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
                     </div>
                     <div class="h-64 w-full"><canvas id="mainChart" class="chart-glow"></canvas></div>
                 </div>
-                <div class="space-y-2 border-r border-white/5 pr-2" data-tip="Gini coefficient — 0 means perfect equality, 1 means total wealth concentration">
+                <div class="space-y-2 border-r border-white/5 pr-2" data-tip="Gini coefficient: 0 means perfect equality, 1 means total wealth concentration">
                     <span class="text-white/55 uppercase">Structural Inequality (Gini)</span>
                     <div class="text-4xl font-bold text-terminal-cyan tracking-tight value-flash" id="macro-gini">—</div>
                     <div class="text-[11px] text-white/55">consumer wealth distribution</div>
@@ -337,7 +333,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
                     <div class="text-3xl font-bold text-white tracking-tighter value-flash" id="macro-money">—</div>
                     <div class="flex gap-3 text-[11px] text-white/40">
                         <span data-tip="Tax revenue accumulated in the public coffer">TREASURY <span id="macro-treasury" class="text-terminal-gold">—</span></span>
-                        <span data-tip="Income tax rate — admin sets via Policy Manager or shell">τ <span id="macro-tax" class="text-terminal-magenta">—</span></span>
+                        <span data-tip="Income tax rate: admin sets via Policy Manager or shell">τ <span id="macro-tax" class="text-terminal-magenta">—</span></span>
                     </div>
                 </div>
             </div>`);
@@ -370,7 +366,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
                 <div class="grid grid-cols-3 gap-1 border-t border-white/5 pt-2">
                     <button data-cmd="pause"  data-tip="Halt the kernel tick loop" class="pm-admin py-1 text-[12px] uppercase border border-white/10 text-white/60 hover:bg-white/5">Pause</button>
                     <button data-cmd="resume" data-tip="Resume the kernel tick loop" class="pm-admin py-1 text-[12px] uppercase border border-white/10 text-white/60 hover:bg-white/5">Resume</button>
-                    <button data-cmd="reset"  data-tip="Reset the simulation — all balances back to defaults, treasury cleared" class="pm-admin py-1 text-[12px] uppercase border border-terminal-red/30 text-terminal-red hover:bg-terminal-red/10">Reset</button>
+                    <button data-cmd="reset"  data-tip="Reset the simulation: all balances back to defaults, treasury cleared" class="pm-admin py-1 text-[12px] uppercase border border-terminal-red/30 text-terminal-red hover:bg-terminal-red/10">Reset</button>
                 </div>
                 <div class="text-[11px] text-white/55 flex justify-between border-t border-white/5 pt-2">
                     <span>STEP <span id="pm-step" class="text-terminal-gold">—</span></span>
@@ -468,26 +464,27 @@ _w.launchWindow = function(/** @type {string} */ type) {
                 <div id="shell-output" class="flex-1 text-white/60 overflow-auto mb-2 space-y-0.5"></div>
                 <div class="flex items-center gap-2 border-t border-white/5 pt-2">
                     <span class="text-terminal-cyan font-bold">root@econos:~$</span>
-                    <input id="shell-input" class="flex-1 bg-transparent border-none outline-none text-white font-mono"
-                        placeholder="type 'help' — 'sudo &lt;token&gt;' for admin" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input id="shell-input" type="text"
+                        class="bg-transparent outline-none flex-1 font-mono text-white text-[12px]"
+                        placeholder="type 'help' or 'sudo <token>' for admin" autocomplete="off" autocapitalize="off" spellcheck="false">
                 </div>
             </div>`);
 
-        const out = document.getElementById('shell-output');
+        const output = document.getElementById('shell-output');
         const input = /** @type {HTMLInputElement | null} */ (document.getElementById('shell-input'));
-        if (!out || !input) return;
+        if (!output || !input) return;
 
         /** @param {string} text
-         * @param {string} [cls] */
-        const append = (text, cls = 'text-white/60') => {
-            const d = document.createElement('div');
-            d.className = cls + ' whitespace-pre';
-            d.textContent = text;
-            out.appendChild(d);
-            out.scrollTop = out.scrollHeight;
+         * @param {string=} cls */
+        const append = (text, cls = 'text-white/70') => {
+            const row = document.createElement('div');
+            row.className = cls;
+            row.textContent = text;
+            output.appendChild(row);
+            output.scrollTop = output.scrollHeight;
         };
         append('>>> [SYSTEM_AUTH] read-only session attached to shared kernel', 'text-terminal-cyan');
-        append("$ type 'help' to list commands. 'sudo <token>' to elevate.", 'text-white/40');
+        append("type 'help' to list commands. 'sudo <token>' to elevate.", 'text-white/40');
 
         /** @type {string[]} */
         const history = [];
@@ -495,8 +492,8 @@ _w.launchWindow = function(/** @type {string} */ type) {
 
         input.addEventListener('keydown', async (e) => {
             if (e.key === 'ArrowUp') {
-                if (history.length === 0) return;
-                histIdx = Math.max(0, (histIdx === -1 ? history.length : histIdx) - 1);
+                if (!history.length) return;
+                histIdx = histIdx === -1 ? history.length - 1 : Math.max(0, histIdx - 1);
                 input.value = history[histIdx] || '';
                 e.preventDefault();
                 return;
@@ -519,7 +516,7 @@ _w.launchWindow = function(/** @type {string} */ type) {
             const echoed = /^\s*sudo\s+/i.test(line) ? 'sudo ****' : line;
             append('> ' + echoed, 'text-white/80');
 
-            // Only the verb — never args. 'sudo abc123' becomes 'sudo'; tokens stay private.
+            // Send only the verb without args for telemetry ('sudo abc123' -> 'sudo')
             const verb = (line.trim().split(/\s+/)[0] || '').slice(0, 24);
             if (typeof _w.va === 'function') {
                 _w.va('event', { name: 'shell_command_run', data: { cmd: verb } });
@@ -725,8 +722,6 @@ function initMacroChart(kc) {
     });
 }
 
-// --- tooltips: data-tip attribute + global hover handler ---
-
 function setupTooltips() {
     const tip = document.createElement('div');
     tip.id = 'tooltip';
@@ -741,23 +736,19 @@ function setupTooltips() {
         if (!text) return;
         activeEl = el;
         tip.textContent = text;
-        // Reset transform/visibility before measuring so width reflects the new text,
-        // not stale layout from the previous target.
+        // Reset transform/visibility before measuring so width reflects the new text.
         tip.style.transform = 'none';
         tip.style.left = '0';
         tip.style.top = '0';
-        const tipW = tip.offsetWidth;   // forces reflow with new text
+        const tipW = tip.offsetWidth;
         const tipH = tip.offsetHeight;
         const half = tipW / 2;
 
         const r = el.getBoundingClientRect();
-        // Prefer above; flip below if no headroom.
         const placeBelow = r.top - tipH - 10 < MARGIN;
         const top = placeBelow ? r.bottom + 10 : r.top - 10;
 
-        // Center horizontally on the target, then clamp so neither edge
-        // leaves the viewport. Previous version used a fixed 80px buffer,
-        // which clipped wide tooltips at the screen edge (desktop icons).
+        // Center horizontally on the target and clamp within viewport bounds.
         let left = r.left + r.width / 2;
         left = Math.max(half + MARGIN, Math.min(left, window.innerWidth - half - MARGIN));
 
@@ -781,18 +772,16 @@ function setupTooltips() {
     document.addEventListener('mousedown', hide); // hide on any click
 }
 
-// --- guided tour: spotlight + callout + step counter ---
-
 const TOUR_STEPS = [
     {
         title: 'Welcome to EconOS',
-        body: 'This is a live multi-agent economic simulation. Twelve RL agents — 10 consumers, 2 producers — are trading right now. You\'re seeing the same simulation as every other visitor.',
+        body: 'This is a live multi-agent economic simulation. Twelve RL agents (10 consumers, 2 producers) are trading right now. You\'re seeing the same simulation as every other visitor.',
         target: '#sys-link',
         focusWindow: null,
     },
     {
         title: 'Macro Monitor',
-        body: 'Live wage and price chart. The Gini coefficient measures inequality (0 = equal, 1 = total concentration). System Liquidity is the total money in circulation — conserved unless taxed.',
+        body: 'Live wage and price chart. The Gini coefficient measures inequality (0 = equal, 1 = total concentration). System Liquidity is the total money in circulation, conserved unless taxed.',
         target: '#mainChart',
         focusWindow: 'macro-monitor',
     },
@@ -934,11 +923,6 @@ function startTour() {
 }
 _w.startTour = startTour;
 
-// --- theme cycling: dark / light / system ---
-// The inline <head> script resolves and applies the initial theme before
-// first paint. This wires the taskbar toggle + a matchMedia listener so the
-// 'system' mode actually follows the OS theme changes in real time.
-
 const THEME_KEY = 'econos.themePref';
 /** @type {Object<string, string>} */
 const THEME_ICONS = { dark: 'ph-moon', light: 'ph-sun', system: 'ph-desktop' };
@@ -970,8 +954,6 @@ function applyTheme(pref) {
         btn.innerHTML = `<i class="ph ${THEME_ICONS[pref]}"></i>`;
         btn.setAttribute('data-tip', THEME_TIPS[pref]);
     }
-    // Track preference change as an analytics event (only when explicitly cycled,
-    // not on first-paint apply — see setThemePref).
 }
 /** @param {string} pref */
 function setThemePref(pref) {
@@ -984,8 +966,6 @@ function setThemePref(pref) {
 _w.cycleTheme = function () {
     setThemePref(THEME_CYCLE[getThemePref()]);
 };
-
-// --- boot ---
 
 document.addEventListener('DOMContentLoaded', () => {
     _w.econWM = new WindowManager();
@@ -1055,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', () => {
     linkBadge.id = 'sys-link';
     linkBadge.className = 'text-terminal-red flex items-center gap-1.5';
     linkBadge.innerHTML = '<i class="ph-fill ph-circle text-[8px]"></i> OFFLINE';
-    linkBadge.setAttribute('data-tip', 'WebSocket connection state — LIVE means kernel ticks are streaming');
+    linkBadge.setAttribute('data-tip', 'WebSocket connection state: LIVE means kernel ticks are streaming');
     taskMeta.insertBefore(linkBadge, taskMeta.firstChild);
 
     _w.kernelClient.subscribe((/** @type {any} */ s, /** @type {boolean=} */ connected) => {
