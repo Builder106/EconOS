@@ -62,3 +62,7 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["server", "simulation"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
