@@ -33,9 +33,9 @@ EconOS treats economic agents as system processes, providing a glassmorphic desk
 </picture>
 
 <details>
-<summary><b>Fed mode — admin tax propagates from shell to Policy Manager</b></summary>
+<summary><b>Fed mode: admin tax changes propagate from shell to Policy Manager</b></summary>
 
-After `sudo <token>`elevates the connection,`tax 25` in the shell mutates the running kernel and the Policy Manager UI snaps to 25.00% on the next tick.
+After `sudo <token>` elevates permissions, entering `tax 25` in the shell updates the running simulation kernel, and the Policy Manager UI updates to 25.00% on the next tick.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/02-admin-tax-propagation-dark.gif">
@@ -46,9 +46,9 @@ After `sudo <token>`elevates the connection,`tax 25` in the shell mutates the ru
 </details>
 
 <details>
-<summary><b>Broadcast events — admin shocks visible to every viewer</b></summary>
+<summary><b>Broadcast events: economic shocks visible to every viewer</b></summary>
 
-`shock wage 10`issued by one admin's shell broadcasts as a`* [ADMIN] shock_applied` event to every connected viewer's shell. The kernel applies the multiplicative shock on the next tick.
+`shock wage 10` issued by one user's terminal broadcasts an administrative event to every connected viewer. The simulation kernel applies the wage change on the next tick.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/03-admin-shock-broadcast-dark.gif">
@@ -60,7 +60,7 @@ After `sudo <token>`elevates the connection,`tax 25` in the shell mutates the ru
 
 ## User Flow
 
-Every visitor lands in the same place — the shared kernel ticks regardless of who's watching. The interesting branch is `sudo`: once elevated, admin actions mutate the running kernel and **broadcast back to every connected viewer**, which is what the "shared mainframe" pitch actually means.
+Every visitor lands in the same shared environment: the shared simulation ticks continuously regardless of how many people are watching. Authenticated administrators can adjust market parameters (taxes, price shocks, pauses) that broadcast in real time to every connected user.
 
 ```mermaid
 flowchart TD
@@ -89,7 +89,7 @@ flowchart TD
     Event -.-> Live
 ```
 
-The dotted feedback edge is the single piece of magic — without it EconOS would be N independent simulations. With it, one admin's `tax 25` shows up on every other visitor's Macro Monitor inside one tick.
+The feedback loop ensures that one user's policy adjustment immediately reflects on every other visitor's dashboard.
 
 ## Key Features
 
