@@ -9,6 +9,11 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy
 
 WORKDIR /app
+ 
+# Install build tools for C wheels (e.g. tinyscaler on arm64)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Python deps first for better layer caching.
 COPY pyproject.toml uv.lock ./
