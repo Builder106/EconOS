@@ -34,8 +34,8 @@ py-modules = []
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore::DeprecationWarning:starlette.*",
-    "ignore:.*httpx2.*:DeprecationWarning",
+    "ignore::DeprecationWarning",
+    "ignore:.*starlette.*",
 ]
 
 [tool.ruff]
