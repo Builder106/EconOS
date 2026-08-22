@@ -65,7 +65,9 @@ jobs:
         run: uv run --frozen ruff check server simulation
 
       - name: Run pytest
-        run: uv run --frozen pytest
+        env:
+          PYTHONWARNINGS: "error"
+        run: uv run --frozen pytest -W error
 
   playwright:
     name: playwright (e2e dashboard)
