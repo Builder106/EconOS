@@ -68,6 +68,7 @@ jobs:
         env:
           PYTHONWARNINGS: "error"
         run: uv run --frozen pytest -W error
+        run: uv run --frozen pytest
 
   playwright:
     name: playwright (e2e dashboard)

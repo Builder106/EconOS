@@ -36,6 +36,7 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
     "ignore:.*starlette.*",
+    "ignore:.*httpx.*",
 ]
 
 [tool.ruff]
