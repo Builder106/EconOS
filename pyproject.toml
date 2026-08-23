@@ -22,6 +22,7 @@ dev = [
     "pytest-cov",
     "pytest-asyncio",
     "ruff",
+    "httpx2",
 ]
 
 [tool.uv]
@@ -32,10 +33,12 @@ default-groups = []
 py-modules = []
 
 [tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["simulation/tests"]
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
 filterwarnings = [
     "error",
-    "ignore:.*starlette.*:DeprecationWarning",
-    "ignore:.*httpx.*:DeprecationWarning",
 ]
 
 [tool.ruff]
