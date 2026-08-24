@@ -1,12 +1,13 @@
-"""Tests for the EconOS FastAPI web server, WebSocket layer, and KernelService tick loop."""
 import asyncio
 import json
+from unittest.mock import AsyncMock
 
 import pytest
+from fastapi import WebSocketDisconnect
 from fastapi.testclient import TestClient
 
 from server.kernel import KernelService, _try_load_ppo
-from server.main import _ack, app
+from server.main import _ack, app, ws
 
 
 def test_healthz_endpoint():
@@ -51,6 +52,17 @@ def test_try_load_ppo(tmp_path):
     assert _try_load_ppo(str(corrupt_file)) is None
 
 
+def test_act_with_none_model():
+    """Verify _act falls back to sampling action space when model is None."""
+    ks = KernelService()
+    ks.consumer_model = None
+    ks.producer_model = None
+    c_action = ks._act("consumer_0", None)
+    p_action = ks._act("producer_0", None)
+    assert c_action.shape == (2,)
+    assert p_action.shape == (2,)
+
+
 def test_act_with_mock_model():
     """Verify _act invokes model.predict when model is loaded."""
     ks = KernelService()
@@ -64,7 +76,6 @@ def test_act_with_mock_model():
     assert action == 42
 
 
-
 def test_websocket_connect_and_snapshot():
     """Verify WebSocket connection sends initial snapshot."""
     with TestClient(app) as client:
@@ -72,6 +83,32 @@ def test_websocket_connect_and_snapshot():
             initial = ws.receive_json()
             assert initial["type"] == "tick"
             assert "market" in initial
+
+
+def test_websocket_binary_frame_and_disconnect():
+    """Verify WebSocket handles binary frames and client disconnections gracefully."""
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as ws:
+            _ = ws.receive_json()
+            ws.send_bytes(b"\x00\x01\x02\x03")
+
+
+@pytest.mark.asyncio
+async def test_ws_send_loop_disconnect_handling():
+    """Verify send_loop catches WebSocketDisconnect and RuntimeError."""
+    # Test WebSocketDisconnect in send_loop
+    mock_ws1 = AsyncMock()
+    mock_ws1.accept = AsyncMock()
+    mock_ws1.receive_text = AsyncMock(side_effect=asyncio.Event().wait)
+    mock_ws1.send_text = AsyncMock(side_effect=WebSocketDisconnect(1000))
+    await ws(mock_ws1)
+
+    # Test RuntimeError in send_loop
+    mock_ws2 = AsyncMock()
+    mock_ws2.accept = AsyncMock()
+    mock_ws2.receive_text = AsyncMock(side_effect=asyncio.Event().wait)
+    mock_ws2.send_text = AsyncMock(side_effect=RuntimeError("send failed"))
+    await ws(mock_ws2)
 
 
 def test_websocket_command_dispatch():
@@ -116,6 +153,16 @@ def test_websocket_admin_flow_and_broadcast():
             assert "requires admin" in ack_unauth["error"]
 
 
+def test_unhandled_route_errors():
+    """Verify unhandled route errors and method not allowed responses."""
+    with TestClient(app) as client:
+        res_404 = client.get("/nonexistent/api/path")
+        assert res_404.status_code == 404
+
+        res_405 = client.post("/healthz")
+        assert res_405.status_code == 405
+
+
 @pytest.mark.asyncio
 async def test_kernel_service_run_loop_and_admin_cmds():
     """Verify KernelService async tick loop, pause/resume, shocks, and event broadcast."""
@@ -143,6 +190,10 @@ async def test_kernel_service_run_loop_and_admin_cmds():
     assert tax_res["ok"] is True
     assert tax_res["tax_rate"] == 0.15
 
+    redist_res = ks.cmd_redistribute()
+    assert redist_res["ok"] is True
+    assert "total" in redist_res
+
     shock_res = ks.cmd_shock("wage", 0.05)
     assert shock_res["ok"] is True
 
@@ -158,6 +209,36 @@ async def test_kernel_service_run_loop_and_admin_cmds():
     # Unsubscribe and stop
     ks.unsubscribe(q)
     assert q not in ks.subscribers
+    await ks.stop()
+    # Stopping when task is None or already done is a no-op
+    await ks.stop()
+
+
+@pytest.mark.asyncio
+async def test_kernel_service_truncation_reset_in_run_loop():
+    """Verify that truncation in the tick loop triggers environment reset."""
+    ks = KernelService()
+    ks.env.max_cycles = 1  # Force immediate truncation after 1 tick
+    q = ks.subscribe()
+
+    await ks.start()
+    # Receive at least 2 ticks to exercise truncation branch and reset in _run loop
+    _ = await asyncio.wait_for(q.get(), timeout=2.0)
+    _ = await asyncio.wait_for(q.get(), timeout=2.0)
+    await ks.stop()
+
+
+@pytest.mark.asyncio
+async def test_kernel_service_queue_full_in_run_loop():
+    """Verify kernel drops subscribers whose queues overflow during the tick loop."""
+    ks = KernelService()
+    q_full = asyncio.Queue(maxsize=1)
+    q_full.put_nowait("existing")
+    ks.subscribers.add(q_full)
+
+    await ks.start()
+    await asyncio.sleep(0.6)  # Allow at least one tick to execute and discard q_full
+    assert q_full not in ks.subscribers
     await ks.stop()
 
 

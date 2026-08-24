@@ -173,3 +173,38 @@ def test_command_error_branches(kernel, commands_module):
     assert "parse error" in err["error"]
 
 
+def test_redistribute_command_flow(kernel, commands_module):
+    # Non-admin fails
+    conn_user = commands_module.Connection(is_admin=False)
+    res_unauth = commands_module.dispatch(kernel, conn_user, "redistribute")
+    assert not res_unauth["ok"]
+    assert "requires admin" in res_unauth["error"]
+
+    # Admin succeeds
+    conn_admin = commands_module.Connection(is_admin=True)
+    res_auth = commands_module.dispatch(kernel, conn_admin, "redistribute")
+    assert res_auth["ok"]
+    assert "disbursed" in res_auth["output"]
+
+
+def test_dispatch_unexpected_internal_exception(kernel, commands_module, monkeypatch):
+    conn = commands_module.Connection(is_admin=True)
+
+    def crashing_handler(*args, **kwargs):
+        raise RuntimeError("boom!")
+
+    monkeypatch.setattr(commands_module.COMMANDS["reset"], "handler", crashing_handler)
+    res = commands_module.dispatch(kernel, conn, "reset")
+    assert not res["ok"]
+    assert "internal error: boom!" in res["error"]
+
+
+def test_gini_command_with_no_consumers(kernel, commands_module):
+    conn = commands_module.Connection(is_admin=False)
+    kernel.env.agents = [a for a in kernel.env.agents if "producer" in a]
+    res = commands_module.dispatch(kernel, conn, "gini")
+    assert res["ok"]
+    assert "gini = 0.0000" in res["output"]
+
+
+

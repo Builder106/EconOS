@@ -36,7 +36,7 @@ py-modules = []
 pythonpath = ["."]
 testpaths = ["simulation/tests"]
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-q"
+addopts = "--cov=simulation --cov=server --cov-report=term-missing --cov-report=xml --cov-fail-under=100"
 filterwarnings = [
     "error",
 ]

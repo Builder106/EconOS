@@ -38,9 +38,7 @@ def test_money_conservation():
         for agent in env.agents:
             actions[agent] = env.action_space(agent).sample()
 
-        _obs, _rewards, terminations, _truncations, _infos = env.step(actions)
-        if any(terminations.values()):
-            break
+        _obs, _rewards, _terminations, _truncations, _infos = env.step(actions)
 
     final_money = get_total_money()
 
