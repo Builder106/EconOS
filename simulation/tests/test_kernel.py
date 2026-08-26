@@ -21,6 +21,7 @@ def test_cobb_douglas_utility():
     u_norm = env._calculate_utility(consumption=1, labor=0)
     assert u_norm > 0
 
+
 def test_money_conservation():
     """Verify that total money in the system is conserved across steps."""
     env = MarketEnv(num_consumers=10, num_producers=2)
@@ -46,6 +47,7 @@ def test_money_conservation():
     # We allow for floating point precision differences.
     assert final_money == pytest.approx(initial_money, rel=1e-5)
 
+
 def test_environment_reset():
     """Verify that reset returns valid observations for all agents."""
     env = MarketEnv()
@@ -54,6 +56,7 @@ def test_environment_reset():
     for agent, o in obs.items():
         assert not np.isnan(o).any()
         assert o.shape == env.observation_space(agent).shape
+
 
 def test_environment_branches():
     # test agent_filter
@@ -88,6 +91,7 @@ def test_environment_branches():
     env.render()
     env.close()
 
+
 def test_logic_functions():
     # test utility_function
     u = utility_function(0, 0.5)
@@ -110,6 +114,7 @@ def test_logic_functions():
     # perfect equality
     gini_zero = calculate_gini([10, 10, 10])
     assert gini_zero == pytest.approx(0.0, abs=1e-5)
+
 
 def test_ubi_redistribution():
     """Verify that treasury tax revenue is correctly redistributed to consumers as UBI."""
@@ -135,6 +140,7 @@ def test_ubi_redistribution():
         ):
             assert b_after == pytest.approx(b_before + per_consumer)
 
+
 def test_macro_analytics():
     """Verify CPI, Real GDP, and Lorenz Curve calculation functions."""
     from simulation.logic import calculate_cpi, calculate_lorenz_curve, calculate_real_gdp
@@ -152,4 +158,3 @@ def test_macro_analytics():
     assert len(lorenz["quantiles"]) == 6
     assert lorenz["quantiles"][0] == 0.0
     assert lorenz["quantiles"][-1] == 1.0
-

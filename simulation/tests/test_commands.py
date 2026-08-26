@@ -4,6 +4,7 @@ Drives the dispatch layer against a real KernelService (no asyncio tick loop —
 we never call .start()), so command effects on env state are visible
 synchronously.
 """
+
 import importlib
 
 import pytest
@@ -21,6 +22,7 @@ def commands_module(monkeypatch):
     """Reload commands.py with a known ADMIN_TOKEN so sudo is testable."""
     monkeypatch.setenv("ADMIN_TOKEN", "test-token-xyz")
     import server.commands as commands
+
     return importlib.reload(commands)
 
 
@@ -94,6 +96,7 @@ def test_sudo_flow_elevates_connection(kernel, commands_module):
 def test_sudo_disabled_without_admin_token(kernel, monkeypatch):
     monkeypatch.delenv("ADMIN_TOKEN", raising=False)
     import server.commands as commands
+
     importlib.reload(commands)
     conn = commands.Connection()
     res = commands.dispatch(kernel, conn, "sudo anything")
@@ -205,6 +208,3 @@ def test_gini_command_with_no_consumers(kernel, commands_module):
     res = commands_module.dispatch(kernel, conn, "gini")
     assert res["ok"]
     assert "gini = 0.0000" in res["output"]
-
-
-

@@ -49,18 +49,18 @@ def train_and_sim():
 
         obs, rewards, _, truncations, _ = env.step(actions)
 
-        consumer_balances = [
-            env.agent_balances[a] for a in env.agents if "consumer" in a
-        ]
-        data_log.append({
-            "step": i,
-            "avg_wage": float(env.market_wage),
-            "avg_price": float(env.market_price),
-            "total_utility": float(sum(r for k, r in rewards.items() if "consumer" in k)),
-            "gini": float(calculate_gini(consumer_balances)),
-            "treasury": float(env.treasury),
-            "tax_rate": float(env.tax_rate),
-        })
+        consumer_balances = [env.agent_balances[a] for a in env.agents if "consumer" in a]
+        data_log.append(
+            {
+                "step": i,
+                "avg_wage": float(env.market_wage),
+                "avg_price": float(env.market_price),
+                "total_utility": float(sum(r for k, r in rewards.items() if "consumer" in k)),
+                "gini": float(calculate_gini(consumer_balances)),
+                "treasury": float(env.treasury),
+                "tax_rate": float(env.tax_rate),
+            }
+        )
 
         if any(truncations.values()):
             break

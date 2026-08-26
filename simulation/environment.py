@@ -26,8 +26,9 @@ class MarketEnv(ParallelEnv):
         self.treasury = 0.0
         self._pending_shocks = []
 
-        all_agents = [f"consumer_{i}" for i in range(num_consumers)] + \
-                    [f"producer_{i}" for i in range(num_producers)]
+        all_agents = [f"consumer_{i}" for i in range(num_consumers)] + [
+            f"producer_{i}" for i in range(num_producers)
+        ]
 
         if agent_filter == "consumers":
             self.possible_agents = [f"consumer_{i}" for i in range(num_consumers)]
@@ -50,7 +51,7 @@ class MarketEnv(ParallelEnv):
 
     def _calculate_utility(self, consumption, labor):
         """Cobb-Douglas utility: C^0.7 * (1-L)^0.3"""
-        return float((consumption ** 0.7) * ((1.0 - labor) ** 0.3))
+        return float((consumption**0.7) * ((1.0 - labor) ** 0.3))
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent):
@@ -103,11 +104,14 @@ class MarketEnv(ParallelEnv):
         return total_disbursed, amount_per_consumer
 
     def _get_obs(self, agent):
-        return np.array([
-            self.market_wage / 100.0,
-            self.market_price / 100.0,
-            self.agent_balances[agent] / 1000.0
-        ], dtype=np.float32)
+        return np.array(
+            [
+                self.market_wage / 100.0,
+                self.market_price / 100.0,
+                self.agent_balances[agent] / 1000.0,
+            ],
+            dtype=np.float32,
+        )
 
     def step(self, actions):
         if not actions:
@@ -128,8 +132,8 @@ class MarketEnv(ParallelEnv):
             avg_wage_adj = np.mean([a[0] for a in producer_actions]) * 2.0 - 1.0
             avg_price_adj = np.mean([a[1] for a in producer_actions]) * 2.0 - 1.0
 
-            self.market_wage *= (1.0 + avg_wage_adj * 0.1)
-            self.market_price *= (1.0 + avg_price_adj * 0.1)
+            self.market_wage *= 1.0 + avg_wage_adj * 0.1
+            self.market_price *= 1.0 + avg_price_adj * 0.1
 
             self.market_wage = np.clip(self.market_wage, 1.0, 100.0)
             self.market_price = np.clip(self.market_price, 1.0, 100.0)

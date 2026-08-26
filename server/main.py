@@ -9,6 +9,7 @@ Per-connection: one receive coroutine pushes acks onto the same queue the
 kernel pumps ticks/events into; one send coroutine drains that queue. Single
 writer means tick frames and acks can never interleave bytes on the wire.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -38,8 +39,7 @@ DASHBOARD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dashbo
 #     ALLOWED_ORIGIN_REGEX=^https://econ-os-git-[a-z0-9-]+-[a-z0-9-]+\.vercel\.app$
 _origins_env = os.environ.get("ALLOWED_ORIGINS", "*").strip()
 ALLOWED_ORIGINS = (
-    ["*"] if _origins_env == "*"
-    else [o.strip() for o in _origins_env.split(",") if o.strip()]
+    ["*"] if _origins_env == "*" else [o.strip() for o in _origins_env.split(",") if o.strip()]
 )
 ALLOWED_ORIGIN_REGEX = os.environ.get("ALLOWED_ORIGIN_REGEX", "").strip() or None
 

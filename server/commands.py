@@ -9,6 +9,7 @@ Admin elevation is per-WebSocket-connection. Reconnecting drops it — by design
 If ADMIN_TOKEN is unset on the server, admin commands are universally denied
 (no insecure default).
 """
+
 from __future__ import annotations
 
 import os
@@ -28,6 +29,7 @@ class CommandError(Exception):
 @dataclass
 class Connection:
     """Per-WebSocket session state."""
+
     is_admin: bool = False
 
 
@@ -48,10 +50,12 @@ def _register(name: str, requires_admin: bool, summary: str):
             name=name, requires_admin=requires_admin, summary=summary, handler=fn
         )
         return fn
+
     return deco
 
 
 # ---------- public commands ----------
+
 
 @_register("help", False, "list commands")
 def _cmd_help(kernel, conn: Connection, args: list[str]) -> dict:
@@ -65,7 +69,7 @@ def _cmd_help(kernel, conn: Connection, args: list[str]) -> dict:
 @_register("who", False, "show your session info")
 def _cmd_who(kernel, conn: Connection, args: list[str]) -> dict:
     role = "admin" if conn.is_admin else "visitor"
-    uptime = kernel.snapshot()['uptime_s']
+    uptime = kernel.snapshot()["uptime_s"]
     return {"output": f"role={role}  step={kernel.env.num_cycles}  uptime_s={uptime}"}
 
 
@@ -116,6 +120,7 @@ def _cmd_sudo(kernel, conn: Connection, args: list[str]) -> dict:
 
 # ---------- admin commands ----------
 
+
 def _parse_pct(s: str) -> float:
     return float(s.strip().rstrip("%"))
 
@@ -145,20 +150,28 @@ def _cmd_tax(kernel, conn: Connection, args: list[str]) -> dict:
     if not (0.0 <= pct <= 100.0):
         raise CommandError("tax pct must be in [0, 100]")
     result = kernel.cmd_set_tax(pct / 100.0)
-    kernel.broadcast_event({
-        "type": "event", "kind": "tax_changed", "by": "admin",
-        "detail": {"tax_rate": result["tax_rate"]},
-    })
-    return {"output": f"tax_rate → {result['tax_rate']*100:.2f}%"}
+    kernel.broadcast_event(
+        {
+            "type": "event",
+            "kind": "tax_changed",
+            "by": "admin",
+            "detail": {"tax_rate": result["tax_rate"]},
+        }
+    )
+    return {"output": f"tax_rate → {result['tax_rate'] * 100:.2f}%"}
 
 
 @_register("redistribute", True, "redistribute — disburse treasury to consumers as UBI")
 def _cmd_redistribute(kernel, conn: Connection, args: list[str]) -> dict:
     res = kernel.cmd_redistribute()
-    kernel.broadcast_event({
-        "type": "event", "kind": "ubi_redistributed", "by": "admin",
-        "detail": {"total": res["total"], "per_consumer": res["per_consumer"]},
-    })
+    kernel.broadcast_event(
+        {
+            "type": "event",
+            "kind": "ubi_redistributed",
+            "by": "admin",
+            "detail": {"total": res["total"], "per_consumer": res["per_consumer"]},
+        }
+    )
     return {
         "output": (
             f"disbursed {res['total']:.2f} treasury "
@@ -181,10 +194,14 @@ def _cmd_shock(kernel, conn: Connection, args: list[str]) -> dict:
     if not (-50.0 <= pct <= 50.0):
         raise CommandError("shock magnitude must be in [-50, 50] %")
     kernel.cmd_shock(kind, pct / 100.0)
-    kernel.broadcast_event({
-        "type": "event", "kind": "shock_applied", "by": "admin",
-        "detail": {"kind": kind, "magnitude": pct / 100.0},
-    })
+    kernel.broadcast_event(
+        {
+            "type": "event",
+            "kind": "shock_applied",
+            "by": "admin",
+            "detail": {"kind": kind, "magnitude": pct / 100.0},
+        }
+    )
     return {"output": f"queued {kind} shock {pct:+.2f}% (lands next tick)"}
 
 
@@ -196,6 +213,7 @@ def _cmd_reset(kernel, conn: Connection, args: list[str]) -> dict:
 
 
 # ---------- dispatcher ----------
+
 
 def dispatch(kernel, conn: Connection, line: str) -> dict:
     """Parse and run one shell line. Returns {ok, ...payload}."""

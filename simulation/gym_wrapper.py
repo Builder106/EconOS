@@ -9,6 +9,7 @@ class MarketGymEnv(gym.Env):
     A single-agent Gymnasium wrapper for MarketEnv (shared policy).
     This treats every agent step as an independent experience for the RL model.
     """
+
     def __init__(self, agent_filter=None):
         super().__init__()
         self.env = MarketEnv(agent_filter=agent_filter)

@@ -19,12 +19,13 @@ def test_train_and_sim(mock_ppo, tmp_path):
     mock_ppo.return_value = mock_instance
 
     # redirect paths to tmp_path to avoid creating files in the real directory
-    with patch("simulation.train.MODELS_DIR", str(tmp_path / MODELS_DIR)), \
-         patch("simulation.train.DATA_DIR", str(tmp_path / DATA_DIR)), \
-         patch("simulation.train.CONSUMER_PATH", str(tmp_path / CONSUMER_PATH)), \
-         patch("simulation.train.PRODUCER_PATH", str(tmp_path / PRODUCER_PATH)), \
-         patch("simulation.train.TRACE_PATH", str(tmp_path / TRACE_PATH)):
-
+    with (
+        patch("simulation.train.MODELS_DIR", str(tmp_path / MODELS_DIR)),
+        patch("simulation.train.DATA_DIR", str(tmp_path / DATA_DIR)),
+        patch("simulation.train.CONSUMER_PATH", str(tmp_path / CONSUMER_PATH)),
+        patch("simulation.train.PRODUCER_PATH", str(tmp_path / PRODUCER_PATH)),
+        patch("simulation.train.TRACE_PATH", str(tmp_path / TRACE_PATH)),
+    ):
         train_and_sim()
 
     # Verify calls

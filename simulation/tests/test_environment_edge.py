@@ -1,4 +1,5 @@
 """Edge case tests for MarketEnv simulation and economic logic functions."""
+
 import numpy as np
 import pytest
 

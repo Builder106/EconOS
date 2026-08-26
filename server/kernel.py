@@ -4,6 +4,7 @@ Every connected client subscribes to the same instance. The kernel runs whether
 clients are connected or not — like a real mainframe — so visitors join an
 already-running economy mid-stream.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -31,6 +32,7 @@ def _try_load_ppo(path: str):
         return None
     try:
         from stable_baselines3 import PPO
+
         return PPO.load(path)
     except Exception as exc:
         print(f"[kernel] failed to load {path}: {exc}", flush=True)
@@ -83,9 +85,7 @@ class KernelService:
 
     def snapshot(self) -> dict:
         balances = list(self.env.agent_balances.values())
-        consumer_balances = [
-            self.env.agent_balances[a] for a in self.env.agents if "consumer" in a
-        ]
+        consumer_balances = [self.env.agent_balances[a] for a in self.env.agents if "consumer" in a]
         return {
             "type": "tick",
             "step": int(self.env.num_cycles),
