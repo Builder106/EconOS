@@ -12,6 +12,8 @@ Refactored the README introductory pitch and tagline to introduce the multi-agen
 
 Added Universal Basic Income (UBI) treasury redistribution alongside real-time macro indicators (CPI, Real GDP, and Lorenz curve quantiles). Admin users can now issue the `redistribute`command via the Fed shell, which evenly disburses accumulated income tax revenue from`env.treasury` back to active consumer agents while maintaining closed-loop money conservation. All macro metrics calculate live on each 500ms kernel tick and stream over WebSockets to all connected clients.
 
+## 2026-05-10 — Silent fallback hid missing models in Docker container #incident
+
 The trained PPO zips landed in the repo and the VM had them on disk after `git pull`, but `/healthz`still reported`policies_loaded: false`even after a rebuild. The Dockerfile only`COPY`'d `simulation/`, `server/`, and `dashboard/`— never`models/`. So inside the container `/app/models/`didn't exist,`kernel.py:_try_load_ppo()`hit`FileNotFoundError`on both paths, returned`None`twice, and the kernel fell back to random actions. The graceful fallback is exactly what hid the bug: nothing crashed, the dashboard kept ticking, and the only tell was a boolean buried in a health endpoint. Fix was a one-line`COPY models/ models/`. Lesson: a fallback that's too quiet turns a hard failure into a silent regression — the health flag is the only reason this got caught at all.
 
 ## 2026-05-10 — PPO policies trained against a frozen counterparty #decision
