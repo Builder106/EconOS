@@ -6,10 +6,6 @@
   "framework": null,
   "cleanUrls": true,
   "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "staging": true,
-      "**": false
-    }
+    "deploymentEnabled": false
   }
 }
